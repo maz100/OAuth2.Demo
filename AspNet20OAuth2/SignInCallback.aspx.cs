@@ -54,11 +54,12 @@ namespace AspNet20OAuth2
             sb.AppendLine("<br>");
             sb.AppendLine(string.Format("id_token: {0}", id_token));
             sb.AppendLine("<br>");
-            sb.AppendLine(string.Format("token: {0}", access_token));
+            sb.AppendLine(string.Format("signed access token: {0}", access_token));
             sb.AppendLine("<br>");
             sb.AppendLine(string.Format("access token: {0}", CheckToken(access_token)));
 
-            CheckIdToken(id_token);
+            var nonce = Session["nonce"].ToString();
+            CheckIdToken(id_token, nonce);
 
             Literal1.Text = sb.ToString();
         }
@@ -68,12 +69,7 @@ namespace AspNet20OAuth2
             string authorizeUrl = string.Format("http://localhost:3333/core/connect/accesstokenvalidation?token={0}", token);
 
             WebClient client = new WebClient();
-
-            // Add a user agent header in case the 
-            // requested URI contains a query.
-
-            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
+            
             Stream data = client.OpenRead(authorizeUrl);
             StreamReader reader = new StreamReader(data);
             string s = reader.ReadToEnd();
@@ -84,17 +80,12 @@ namespace AspNet20OAuth2
             return s;
         }
 
-        private string CheckIdToken(string token)
+        private string CheckIdToken(string token, string nonce)
         {
-            string authorizeUrl = string.Format("http://localhost:55461/validate?token={0}", token);
+            string authorizeUrl = string.Format("http://localhost:55461/validate?token={0}&nonce={1}", token, nonce);
 
             WebClient client = new WebClient();
-
-            // Add a user agent header in case the 
-            // requested URI contains a query.
-
-            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
+            
             Stream data = client.OpenRead(authorizeUrl);
             StreamReader reader = new StreamReader(data);
             string s = reader.ReadToEnd();

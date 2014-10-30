@@ -27,15 +27,7 @@ namespace AspNet20OAuth2
 
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
-        {
-            using (var client = new WebClient())
-            {
-                client.Headers["Accept"] = "application/json";
-                string result = client.DownloadString("http://localhost:58325/api/values");
-                // now use a JSON parser to parse the resulting string back to some CLR object
-            }
-        }
+        
 
         protected void Button2_Click(object sender, EventArgs e)
         {
@@ -56,6 +48,7 @@ namespace AspNet20OAuth2
             //state is generated for each request.  We check that the response contains the same value for state.
             //if it doesn't we shouldn't continue as the response is not linked with our request and it should not be trusted.
             Session[Constants.OAuth2State] = state;
+            Session["nonce"] = nonce;
 
             Response.Redirect(authorizationUrl.AbsoluteUri);
         }
@@ -63,7 +56,13 @@ namespace AspNet20OAuth2
         public static Uri GetAuthorizeUrl(Uri authorizeEndpoint, Uri redirectUri, string clientId,
             string scopes, string state, string responseType, string nonce)
         {
-            var queryString = string.Format("?client_id={0}&scope={1}&redirect_uri={2}&state={3}&response_type={4}&nonce={5}&response_mode=form_post",
+            var queryString = string.Format("?client_id={0}&" +
+                                            "scope={1}&" +
+                                            "redirect_uri={2}&" +
+                                            "state={3}&" +
+                                            "response_type={4}&" +
+                                            "nonce={5}&" +
+                                            "response_mode=form_post",
                 clientId,
                 scopes,
                 redirectUri,
@@ -72,11 +71,6 @@ namespace AspNet20OAuth2
                 nonce);
             
             return new Uri(authorizeEndpoint.AbsoluteUri + queryString);
-        }
-
-        protected void Button3_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
