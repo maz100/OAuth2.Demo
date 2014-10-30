@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Web.Http;
 using Newtonsoft.Json;
 using Thinktecture.IdentityModel;
+using System;
 
 namespace OAuthHelperApi.Controllers
 {
@@ -56,6 +57,13 @@ namespace OAuthHelperApi.Controllers
 
             SecurityToken jwt;
             var id = new JwtSecurityTokenHandler().ValidateToken(token, parameters, out jwt);
+            
+            if (id.FindFirst("nonce").Value !=
+               id.FindFirst("nonce").Value)
+            {
+                throw new InvalidOperationException("Invalid nonce");
+            }
+
             return id.Claims.ToList();
         }
     }
