@@ -18,16 +18,16 @@ namespace OAuthHelperApi.Controllers
         }
 
         // GET api/<controller>/5
-        public string Get(string token)
+        public string Get(string token, string nonce)
         {
-            var result = ValidateToken(token);
+            var result = ValidateToken(token, nonce);
 
             string json = JsonConvert.SerializeObject(result, Formatting.Indented,
                 new JsonSerializerSettings
                 {
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects
                 });
-            
+
             return json;
         }
 
@@ -46,7 +46,7 @@ namespace OAuthHelperApi.Controllers
         {
         }
 
-        private List<Claim> ValidateToken(string token)
+        private List<Claim> ValidateToken(string token, string nonce)
         {
             var parameters = new TokenValidationParameters
             {
@@ -57,9 +57,8 @@ namespace OAuthHelperApi.Controllers
 
             SecurityToken jwt;
             var id = new JwtSecurityTokenHandler().ValidateToken(token, parameters, out jwt);
-            
-            if (id.FindFirst("nonce").Value !=
-               id.FindFirst("nonce").Value)
+
+            if (id.FindFirst("nonce").Value != nonce)
             {
                 throw new InvalidOperationException("Invalid nonce");
             }
